@@ -41,10 +41,6 @@ serde_json_path = "0.6.7"
 tar = "0.4.42"
 thiserror = "1.0.64"
 
-[patch.crates-io]
-rsonpath-lib = { path = "../rsonpath-lib" }
-rsonpath-syntax = { path = "../rsonpath-syntax" }
-
 [dev-dependencies]
 itertools = "0.13.0"
 regex = "1.11.0"

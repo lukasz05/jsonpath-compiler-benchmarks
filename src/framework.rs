@@ -13,6 +13,7 @@ use criterion::{Criterion, Throughput};
 use implementation::{Implementation, PreparedQuery};
 use std::{path::PathBuf, time::Duration};
 use thiserror::Error;
+use crate::implementations::jsonpath_compiler::{JsonPathCompiler, JsonPathCompilerMmap, JsonPathCompilerError};
 
 pub mod benchmark_options;
 pub mod implementation;
@@ -24,6 +25,8 @@ pub enum BenchTarget<'q> {
     JSurfer(&'q str),
     JsonpathRust(&'q str),
     SerdeJsonPath(&'q str),
+    JsonPathCompilerMmap(&'q str),
+    JsonPathCompiler(&'q str)
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -160,7 +163,8 @@ impl Benchset {
         self.add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
             .add_target(BenchTarget::JSurfer(query))?
             .add_target(BenchTarget::JsonpathRust(query))?
-            .add_target(BenchTarget::SerdeJsonPath(query))
+            .add_target(BenchTarget::SerdeJsonPath(query))?
+            .add_target(BenchTarget::JsonPathCompilerMmap(query))
     }
 
     pub fn add_rust_native_targets(self, query: &str) -> Result<Self, BenchmarkError> {
@@ -234,6 +238,26 @@ impl<'a> Target for BenchTarget<'a> {
                 let prepared = prepare(serde_json_path, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
                 Ok(Box::new(prepared))
             }
+            BenchTarget::JsonPathCompiler(q) => {
+                if load_ahead_of_time {
+                    return Err(BenchmarkError::JsonPathCompiler(
+                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
+                    ))
+                }
+                let jsonpath_compiler = JsonPathCompiler::new()?;
+                let prepared = prepare(jsonpath_compiler, file_path, q, false, compile_ahead_of_time)?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonPathCompilerMmap(q) => {
+                if load_ahead_of_time {
+                    return Err(BenchmarkError::JsonPathCompiler(
+                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
+                    ))
+                }
+                let jsonpath_compiler_mmap = JsonPathCompilerMmap::new()?;
+                let prepared = prepare(jsonpath_compiler_mmap, file_path, q, false, compile_ahead_of_time)?;
+                Ok(Box::new(prepared))
+            }
         }
     }
 
@@ -291,6 +315,40 @@ impl<'a> Target for BenchTarget<'a> {
                     q,
                     load_ahead_of_time,
                     compile_ahead_of_time,
+                )?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonPathCompiler(q) => {
+                if load_ahead_of_time {
+                    return Err(BenchmarkError::JsonPathCompiler(
+                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
+                    ))
+                }
+                let jsonpath_compiler = JsonPathCompiler::new()?;
+                let prepared = prepare_with_id(
+                    jsonpath_compiler,
+                    id,
+                    file_path,
+                    q,
+                    false,
+                    compile_ahead_of_time
+                )?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonPathCompilerMmap(q) => {
+                if load_ahead_of_time {
+                    return Err(BenchmarkError::JsonPathCompiler(
+                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
+                    ))
+                }
+                let jsonpath_compiler_mmap = JsonPathCompiler::new()?;
+                let prepared = prepare_with_id(
+                    jsonpath_compiler_mmap,
+                    id,
+                    file_path,
+                    q,
+                    false,
+                    compile_ahead_of_time
                 )?;
                 Ok(Box::new(prepared))
             }
@@ -367,4 +425,10 @@ pub enum BenchmarkError {
         #[from]
         SerdeJsonPathError,
     ),
+    #[error("error preparing JsonPathCompiler bench: {0}")]
+    JsonPathCompiler(
+        #[source]
+        #[from]
+        JsonPathCompilerError
+    )
 }

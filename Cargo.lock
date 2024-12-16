@@ -292,7 +292,7 @@ dependencies = [
  "encode_unicode",
  "lazy_static",
  "libc",
- "unicode-width 0.1.14",
+ "unicode-width",
  "windows-sys 0.52.0",
 ]
 
@@ -840,7 +840,7 @@ dependencies = [
  "instant",
  "number_prefix",
  "portable-atomic",
- "unicode-width 0.1.14",
+ "unicode-width",
 ]
 
 [[package]]
@@ -1547,6 +1547,8 @@ dependencies = [
 [[package]]
 name = "rsonpath-lib"
 version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6e78a56e3efbfc97033a2544f8fc8b9a5a32c1b5131768b6274a4762618301c8"
 dependencies = [
  "cfg-if",
  "log",
@@ -1562,10 +1564,12 @@ dependencies = [
 [[package]]
 name = "rsonpath-syntax"
 version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9a9f4a9b64fc105cd77135496828cee8aea24bf464d54badb48e6d789fc6cc5e"
 dependencies = [
  "nom",
  "thiserror",
- "unicode-width 0.2.0",
+ "unicode-width",
 ]
 
 [[package]]
@@ -2085,12 +2089,6 @@ name = "unicode-width"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
-
-[[package]]
-name = "unicode-width"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fc81956842c57dac11422a97c3b8195a1ff727f06e85c84ed2e8aa277c9a0fd"
 
 [[package]]
 name = "untrusted"

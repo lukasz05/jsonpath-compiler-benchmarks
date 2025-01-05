@@ -1,0 +1,9 @@
+canada_second_coord_component $.features[*].geometry.coordinates[*][*][1]
+canada_coord_476_1446_1 $..coordinates[476][1446][1]
+citm_seat_category $..seatCategoryId
+ast_nested_inner $..inner..inner..type.qualType
+ast_deepest $..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*
+bestbuy_all_nodes $..*
+google_map_routes $[*].routes[*].legs[*].steps[*].distance.text
+inner_array $..inner[0]
+user_second_mention_index $..entities.user_mentions[1]

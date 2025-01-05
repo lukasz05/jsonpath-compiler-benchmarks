@@ -4,6 +4,7 @@ use std::process::Command;
 
 fn main() -> Result<(), Box<dyn Error>> {
     setup_jsurfer()?;
+    compile_queries()?;
 
     Ok(())
 }
@@ -29,5 +30,18 @@ fn setup_jsurfer() -> Result<()> {
         jar_absolute_path.display()
     );
 
+    Ok(())
+}
+
+fn compile_queries() -> Result<()> {
+    cc::Build::new()
+        .file("src/queries.cpp")
+        .cpp(true)
+        .std("c++20")
+        .opt_level(3)
+        .include("/opt/homebrew/Cellar/simdjson/3.10.1/include")
+        .compile("queries");
+    println!("cargo:rustc-link-search=/opt/homebrew/Cellar/simdjson/3.10.1/lib");
+    println!("cargo:rustc-link-arg=-lsimdjson");
     Ok(())
 }

@@ -1518,6 +1518,7 @@ dependencies = [
 name = "rsonpath-benchmarks"
 version = "0.9.1"
 dependencies = [
+ "cc",
  "cfg-if",
  "clap",
  "color-eyre",
@@ -1532,6 +1533,7 @@ dependencies = [
  "lazy_static",
  "libc",
  "memchr",
+ "memmap2",
  "ouroboros",
  "regex",
  "reqwest",

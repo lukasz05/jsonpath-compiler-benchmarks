@@ -164,13 +164,7 @@ impl Benchset {
             .add_target(BenchTarget::JSurfer(query))?
             .add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
-            .add_target(BenchTarget::JsonPathCompilerMmap(query))
-    }
-
-    pub fn add_rust_native_targets(self, query: &str) -> Result<Self, BenchmarkError> {
-        self.add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
-            .add_target(BenchTarget::JsonpathRust(query))?
-            .add_target(BenchTarget::SerdeJsonPath(query))
+            .add_target(BenchTarget::JsonPathCompiler(query))
     }
 
     pub fn finish(self) -> ConfiguredBenchset {
@@ -239,23 +233,13 @@ impl<'a> Target for BenchTarget<'a> {
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonPathCompiler(q) => {
-                if load_ahead_of_time {
-                    return Err(BenchmarkError::JsonPathCompiler(
-                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
-                    ))
-                }
                 let jsonpath_compiler = JsonPathCompiler::new()?;
-                let prepared = prepare(jsonpath_compiler, file_path, q, false, compile_ahead_of_time)?;
+                let prepared = prepare(jsonpath_compiler, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonPathCompilerMmap(q) => {
-                if load_ahead_of_time {
-                    return Err(BenchmarkError::JsonPathCompiler(
-                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
-                    ))
-                }
                 let jsonpath_compiler_mmap = JsonPathCompilerMmap::new()?;
-                let prepared = prepare(jsonpath_compiler_mmap, file_path, q, false, compile_ahead_of_time)?;
+                let prepared = prepare(jsonpath_compiler_mmap, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
                 Ok(Box::new(prepared))
             }
         }
@@ -319,35 +303,25 @@ impl<'a> Target for BenchTarget<'a> {
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonPathCompiler(q) => {
-                if load_ahead_of_time {
-                    return Err(BenchmarkError::JsonPathCompiler(
-                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
-                    ))
-                }
                 let jsonpath_compiler = JsonPathCompiler::new()?;
                 let prepared = prepare_with_id(
                     jsonpath_compiler,
                     id,
                     file_path,
                     q,
-                    false,
+                    load_ahead_of_time,
                     compile_ahead_of_time
                 )?;
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonPathCompilerMmap(q) => {
-                if load_ahead_of_time {
-                    return Err(BenchmarkError::JsonPathCompiler(
-                        JsonPathCompilerError::AheadOfTimeFileLoadingNotSupportedError
-                    ))
-                }
                 let jsonpath_compiler_mmap = JsonPathCompiler::new()?;
                 let prepared = prepare_with_id(
                     jsonpath_compiler_mmap,
                     id,
                     file_path,
                     q,
-                    false,
+                    load_ahead_of_time,
                     compile_ahead_of_time
                 )?;
                 Ok(Box::new(prepared))

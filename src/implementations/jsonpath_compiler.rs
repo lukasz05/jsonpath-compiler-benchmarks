@@ -1,55 +1,54 @@
+use std::collections::HashMap;
 use std::fmt::Display;
-use std::process::Command;
+use std::fs;
 use std::string::FromUtf8Error;
-
 use thiserror::Error;
-
+use crate::bindings::{ast_deepest, ast_nested_inner, bestbuy_all_nodes, canada_coord_476_1446_1,
+                      canada_second_coord_component, citm_seat_category, google_map_routes,
+                      inner_array, user_second_mention_index};
 use crate::framework::implementation::Implementation;
 
-struct JsonPathCompilerCore {}
+use memmap2::Mmap;
+
+type QueryFunction = fn(&[u8]) -> String;
+
+struct JsonPathCompilerCore<'a> {
+    query_functions: HashMap<&'a str, QueryFunction>
+}
 
 pub struct JsonPathCompilerResult(String);
 
-impl JsonPathCompilerCore {
-    // TODO: make it configurable
-    const COMPILER_PATH: &'static str =
-        "/Users/lukasz/source/jsonpath-compiler/target/debug/jsonpath-compiler";
-    const SIMDJSON_INCLUDE_PATH: &'static str = "-I/opt/homebrew/Cellar/simdjson/3.10.1/include";
-    const SIMDJSON_LIB_PATH: &'static str = "-L/opt/homebrew/Cellar/simdjson/3.10.1/lib";
-    const GENERATED_QUERY_CODE_FILE_PATH: &'static str = "query.cpp";
-    const COMPILED_QUERY_PROG_FILE_PATH: &'static str = "./query";
-
+impl JsonPathCompilerCore<'_> {
     fn new() -> Result<Self, JsonPathCompilerError> {
-        Ok(JsonPathCompilerCore {})
-    }
-
-    fn compile_query(&self, query: &str, mmap: bool) -> Result<(), JsonPathCompilerError> {
-        let mut compile = Command::new(Self::COMPILER_PATH);
-        compile.args(["-o", Self::GENERATED_QUERY_CODE_FILE_PATH]);
-        if mmap {
-            compile.arg("--mmap");
-        }
-        compile.arg(query).status()?;
-        Command::new("c++")
-            .args([
-                Self::GENERATED_QUERY_CODE_FILE_PATH,
-                "-std=c++20",
-                "-O3",
-                Self::SIMDJSON_INCLUDE_PATH,
-                Self::SIMDJSON_LIB_PATH,
-                "-lsimdjson",
-                "-o",
-                Self::COMPILED_QUERY_PROG_FILE_PATH
+        Ok(JsonPathCompilerCore {
+            query_functions: HashMap::from([
+                ("$.features[*].geometry.coordinates[*][*][1]", canada_second_coord_component as QueryFunction),
+                ("$..coordinates[476][1446][1]", canada_coord_476_1446_1 as QueryFunction),
+                ("$..seatCategoryId", citm_seat_category as QueryFunction),
+                ("$..inner..inner..type.qualType", ast_nested_inner as QueryFunction),
+                ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", ast_deepest as QueryFunction),
+                ("$..*", bestbuy_all_nodes as QueryFunction),
+                ("$[*].routes[*].legs[*].steps[*].distance.text", google_map_routes as QueryFunction),
+                ("$..inner[0]", inner_array as QueryFunction),
+                ("$..entities.user_mentions[1]", user_second_mention_index as QueryFunction)
             ])
-            .status()?;
-        Ok(())
+        })
     }
 
-    fn run<'a>(&self, file: &'a String) -> Result<JsonPathCompilerResult, JsonPathCompilerError> {
-        let output = Command::new(Self::COMPILED_QUERY_PROG_FILE_PATH)
-            .arg(file)
-            .output()?;
-        Ok(JsonPathCompilerResult(String::from_utf8(output.stdout)?))
+    fn compile_query(&self, query: &str) -> Result<QueryFunction, JsonPathCompilerError> {
+        match self.query_functions.get(query) {
+            Some(query_function) => {
+                Ok(*query_function)
+            }
+            None => {
+                Err(JsonPathCompilerError::UnrecognizedQuery(query.to_string()))
+            }
+        }
+    }
+
+    fn run<'a>(&self, query_function: &QueryFunction, file: &'a [u8]) -> Result<JsonPathCompilerResult, JsonPathCompilerError> {
+        let res = query_function(file);
+        Ok(JsonPathCompilerResult(res))
     }
 }
 
@@ -65,18 +64,18 @@ pub enum JsonPathCompilerError {
     IoError(#[from] std::io::Error),
     #[error(transparent)]
     Utf8Error(#[from] FromUtf8Error),
-    #[error("Ahead of time file loading is not supported")]
-    AheadOfTimeFileLoadingNotSupportedError
+    #[error("Unrecognized query: '{0}'")]
+    UnrecognizedQuery(String)
 }
 
-pub struct JsonPathCompiler {
-    core: JsonPathCompilerCore,
+pub struct JsonPathCompiler<'a> {
+    core: JsonPathCompilerCore<'a>,
 }
 
-impl Implementation for JsonPathCompiler {
-    type Query = ();
+impl Implementation for JsonPathCompiler<'_> {
+    type Query = QueryFunction;
 
-    type File = String;
+    type File = Vec<u8>;
 
     type Error = JsonPathCompilerError;
 
@@ -93,26 +92,30 @@ impl Implementation for JsonPathCompiler {
     }
 
     fn load_file(&self, file_path: &str) -> Result<Self::File, Self::Error> {
-        Ok(file_path.to_string())
+        let file = fs::read_to_string(file_path)?;
+        let input = file.into_bytes();
+        let padding = vec![0; 64];
+        let padded_input = input.into_iter().chain(padding).collect();
+        Ok(padded_input)
     }
 
     fn compile_query(&self, query: &str) -> Result<Self::Query, Self::Error> {
-        self.core.compile_query(query, false)
+        self.core.compile_query(query)
     }
 
-    fn run<'a>(&self, _query: &'a Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
-        self.core.run(file)
+    fn run<'a>(&self, query: &'a Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
+        self.core.run(query, file)
     }
 }
 
-pub struct JsonPathCompilerMmap {
-    core: JsonPathCompilerCore,
+pub struct JsonPathCompilerMmap<'a> {
+    core: JsonPathCompilerCore<'a>,
 }
 
-impl Implementation for JsonPathCompilerMmap {
-    type Query = ();
+impl Implementation for JsonPathCompilerMmap<'_> {
+    type Query = QueryFunction;
 
-    type File = String;
+    type File = Mmap;
 
     type Error = JsonPathCompilerError;
 
@@ -129,15 +132,19 @@ impl Implementation for JsonPathCompilerMmap {
     }
 
     fn load_file(&self, file_path: &str) -> Result<Self::File, Self::Error> {
-        Ok(file_path.to_string())
+        let file = fs::File::open(file_path)?;
+        unsafe {
+            let mapped_file = Mmap::map(&file)?;
+            Ok(mapped_file)
+        }
     }
 
     fn compile_query(&self, query: &str) -> Result<Self::Query, Self::Error> {
-        self.core.compile_query(query, true)
+        self.core.compile_query(query)
     }
 
-    fn run<'a>(&self, _query: &'a Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
-        self.core.run(file)
+    fn run<'a>(&self, query: &'a Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
+        self.core.run(query, file)
     }
 }
 

@@ -40,6 +40,8 @@ rsonpath-syntax = { version = "0.3.1", default-features = false }
 serde_json_path = "0.6.7"
 tar = "0.4.42"
 thiserror = "1.0.64"
+memmap2 = "0.9.5"
+
 
 [dev-dependencies]
 itertools = "0.13.0"
@@ -52,6 +54,7 @@ simd = ["rsonpath-lib/simd"]
 
 [build-dependencies]
 eyre = "0.6.12"
+cc = "1.0"
 
 [profile.dev]
 lto = false

@@ -41,6 +41,7 @@ serde_json_path = "0.6.7"
 tar = "0.4.42"
 thiserror = "1.0.64"
 memmap2 = "0.9.5"
+uuid = { version = "1.11.0", features = ["v4"] }
 
 
 [dev-dependencies]
@@ -65,4 +66,8 @@ debug = 1
 
 [[bench]]
 name = "main"
+harness = false
+
+[[bench]]
+name = "jwt"
 harness = false

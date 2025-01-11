@@ -1,25 +1,25 @@
-use crate::framework::implementation::Implementation;
-use serde_json::Value;
-use serde_json_path::{JsonPath, NodeList, ParseError};
 use std::{
     fmt::Display,
     fs,
-    io::{self, BufReader},
+    io::self,
 };
+
+use serde_json::Value;
+use serde_json_path::{JsonPath, ParseError};
 use thiserror::Error;
 
-pub struct SerdeJsonPath {}
+use crate::framework::implementation::Implementation;
 
-pub struct SerdeJsonPathResult<'a>(NodeList<'a>);
+pub struct SerdeJsonPath {}
 
 impl Implementation for SerdeJsonPath {
     type Query = JsonPath;
 
-    type File = Value;
+    type File = String;
 
     type Error = SerdeJsonPathError;
 
-    type Result<'a> = SerdeJsonPathResult<'a>;
+    type Result<'a> = usize;
 
     fn id() -> &'static str {
         "serde_json_path"
@@ -30,11 +30,8 @@ impl Implementation for SerdeJsonPath {
     }
 
     fn load_file(&self, file_path: &str) -> Result<Self::File, Self::Error> {
-        let file = fs::File::open(file_path)?;
-        let reader = BufReader::new(file);
-        let value: Value = serde_json::from_reader(reader)?;
-
-        Ok(value)
+        let file = fs::read_to_string(file_path)?;
+        Ok(file)
     }
 
     fn compile_query(&self, query: &str) -> Result<Self::Query, Self::Error> {
@@ -42,17 +39,9 @@ impl Implementation for SerdeJsonPath {
     }
 
     fn run<'a>(&self, query: &Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
-        Ok(SerdeJsonPathResult(query.query(file)))
-    }
-}
-
-impl<'a> Display for SerdeJsonPathResult<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for res in self.0.iter() {
-            writeln!(f, "{res}")?;
-        }
-
-        Ok(())
+        let value: Value = serde_json::from_str(&file)?;
+        let result = query.query(&value);
+        Ok(result.len())
     }
 }
 

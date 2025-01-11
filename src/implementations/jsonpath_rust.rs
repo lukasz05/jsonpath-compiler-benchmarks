@@ -23,7 +23,7 @@ impl Implementation for JsonpathRust {
     type Result<'a> = JsonpathRustResult<'a>;
 
     fn id() -> &'static str {
-        "jsonpath-rust"
+        "jsonpath_rust"
     }
 
     fn new() -> Result<Self, Self::Error> {

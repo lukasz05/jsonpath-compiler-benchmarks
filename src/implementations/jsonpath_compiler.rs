@@ -82,7 +82,7 @@ impl Implementation for JsonPathCompiler<'_> {
     type Result<'a> = JsonPathCompilerResult;
 
     fn id() -> &'static str {
-        "jsonpath-compiler"
+        "jsonpath_compiler_ondemand"
     }
 
     fn new() -> Result<Self, Self::Error> {
@@ -122,7 +122,7 @@ impl Implementation for JsonPathCompilerMmap<'_> {
     type Result<'a> = JsonPathCompilerResult;
 
     fn id() -> &'static str {
-        "jsonpath-compiler-mmap"
+        "jsonpath_compiler_ondemand_mmap"
     }
 
     fn new() -> Result<Self, Self::Error> {

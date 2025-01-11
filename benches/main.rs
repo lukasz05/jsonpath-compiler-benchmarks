@@ -72,9 +72,12 @@ pub fn ast_nested_inner(c: &mut Criterion) -> Result<(), BenchmarkError> {
 }
 
 pub fn ast_deepest(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let query = "$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*";
     let benchset = Benchset::new("ast::deepest", dataset::ast())?
         .do_not_measure_file_load_time()
-        .add_all_targets("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*")?
+        .add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
+        .add_target(BenchTarget::JSurfer(query))?
+        .add_target(BenchTarget::JsonPathCompiler(query))?
         .finish();
 
     benchset.run(c);

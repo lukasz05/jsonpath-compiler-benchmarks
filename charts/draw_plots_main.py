@@ -88,9 +88,9 @@ def plot_benchmark_group(group):
                 measurements.append(float("NaN"))
     x = np.arange(len(benchmarks))
     fig, ax = plt.subplots(layout='constrained')
-    width = 0.2
+    width = 0.15
     multiplier = 0
-    for target, measurement in target_measurements.items():
+    for target, measurement in sorted(target_measurements.items(), key=lambda item: item[0]):
         offset = width * multiplier
         rects = ax.bar(x + offset, measurement, width, label=target)
         ax.bar_label(rects, padding=3)
@@ -99,9 +99,9 @@ def plot_benchmark_group(group):
     ax.set_title(group["name"] + ".json")
     benchmarks_short_names = [benchmark["name"].split(".")[-1].replace("json_", "").replace(f"{group["name"]}__", "")
                               for benchmark in benchmarks]
-    ax.set_xticks(x + width, benchmarks_short_names)
+    ax.set_xticks(x + width * 2, benchmarks_short_names)
     ax.legend(loc="best", ncols=1)
-    ax.set_ylim(0, ((max_measurement // 500) + 1) * 500)
+    ax.set_ylim(0, (((max_measurement + 300) // 500) + 1) * 500)
     plt.savefig(group["name"] + ".png")
 
 

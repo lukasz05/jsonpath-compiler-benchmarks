@@ -1,7 +1,29 @@
+use std::cmp::min;
 use criterion::{Criterion, criterion_group, criterion_main};
 use serde_json::Value;
 use uuid::Uuid;
-use rsonpath_benchmarks::bindings::{claim10, claim20, claim30, claim40, claim50, claim60, claim70, claim80, claim90, claim100, claim110, claim120, claim130, claim140, claim150, claim160, claim170, claim180, claim190, claim200, claim1, claim2, claim3};
+use rsonpath_benchmarks::bindings::{
+    claim1,
+    claim2,
+    claim3,
+    claim4,
+    claim5,
+    claim6,
+    claim7,
+    claim8,
+    claim9,
+    claim10,
+    claim11,
+    claim12,
+    claim13,
+    claim14,
+    claim15,
+    claim16,
+    claim17,
+    claim18,
+    claim19,
+    claim20
+};
 
 struct JWTPayloadGenerator {
     custom_claim_count: usize
@@ -33,31 +55,28 @@ fn get_query_function_for_claim(claim_name: &str) -> fn(&[u8]) -> String  {
         "claim1" => claim1,
         "claim2" => claim2,
         "claim3" => claim3,
+        "claim4" => claim4,
+        "claim5" => claim5,
+        "claim6" => claim6,
+        "claim7" => claim7,
+        "claim8" => claim8,
+        "claim9" => claim9,
         "claim10" => claim10,
+        "claim11" => claim11,
+        "claim12" => claim12,
+        "claim13" => claim13,
+        "claim14" => claim14,
+        "claim15" => claim15,
+        "claim16" => claim16,
+        "claim17" => claim17,
+        "claim18" => claim18,
+        "claim19" => claim19,
         "claim20" => claim20,
-        "claim30" => claim30,
-        "claim40" => claim40,
-        "claim50" => claim50,
-        "claim60" => claim60,
-        "claim70" => claim70,
-        "claim80" => claim80,
-        "claim90" => claim90,
-        "claim100" => claim100,
-        "claim110" => claim110,
-        "claim120" => claim120,
-        "claim130" => claim130,
-        "claim140" => claim140,
-        "claim150" => claim150,
-        "claim160" => claim160,
-        "claim170" => claim170,
-        "claim180" => claim180,
-        "claim190" => claim190,
-        "claim200" => claim200,
         _ => unimplemented!()
     }
 }
 
-fn jsonpath_compiler_get_claim(padded_payload: &[u8], claim_names: &[&str]) -> Vec<String> {
+fn jsonpath_compiler_get_claim(padded_payload: &[u8], claim_names: &[String]) -> Vec<String> {
     let mut result = Vec::new();
     for claim_name in claim_names {
         let query_function = get_query_function_for_claim(claim_name);
@@ -66,7 +85,7 @@ fn jsonpath_compiler_get_claim(padded_payload: &[u8], claim_names: &[&str]) -> V
     result
 }
 
-fn serde_get_claim(payload_json: &str, claim_names: &[&str]) -> Vec<String> {
+fn serde_get_claim(payload_json: &str, claim_names: &[String]) -> Vec<String> {
     let parsed_json: Value = serde_json::from_str(payload_json).unwrap();
     let mut result = Vec::new();
     for claim_name in claim_names {
@@ -76,46 +95,72 @@ fn serde_get_claim(payload_json: &str, claim_names: &[&str]) -> Vec<String> {
 }
 
 
-fn benchmark_inner(c: &mut Criterion, name: &str, claim_count: usize, selected_claims: &[&str]) {
-    let mut group = c.benchmark_group(name);
+fn benchmark_inner(c: &mut Criterion, claim_count: usize) {
+    let mut group = c.benchmark_group(format!("{claim_count}_claims"));
 
     let json = JWTPayloadGenerator::new(claim_count).generate();
     let json_bytes = json.to_string().into_bytes();
     let padding = vec![0; 64];
     let padded_payload_bytes: Vec<u8> = json_bytes.into_iter().chain(padding).collect();
 
-    group.bench_function("serde-json", |b| b.iter(|| serde_get_claim(&json, selected_claims)));
-    group.bench_function("jsonpath-compiler", |b| b.iter(|| jsonpath_compiler_get_claim(&padded_payload_bytes, selected_claims)));
+    for selected_claim_count in 1..min(claim_count+1, 11) {
+        let selected_claims: Vec<String> = (1..selected_claim_count+1)
+            .map(|i| format!("claim{i}"))
+            .collect();
+        group.bench_function(
+            format!("serde_json_{selected_claim_count}"),
+            |b| b.iter(|| serde_get_claim(&json, &selected_claims))
+        );
+        group.bench_function(
+            format!("jsonpath_compiler_{selected_claim_count}"),
+            |b| b.iter(|| jsonpath_compiler_get_claim(&padded_payload_bytes, &selected_claims))
+        );
+    }
+
     group.finish();
 }
 
-fn claim_count_10(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_10", 10, &["claim10"])
+fn claims_10(c: &mut Criterion) {
+    benchmark_inner(c, 10)
 }
 
-fn claim_count_100(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_100", 100, &["claim50"])
+fn claims_20(c: &mut Criterion) {
+    benchmark_inner(c, 20)
 }
 
-fn claim_count_200(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_200", 200, &["claim100"])
+fn claims_30(c: &mut Criterion) {
+    benchmark_inner(c, 30)
 }
 
-fn claim_count_10_multiple_selected(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_10_multiple_selected", 10, &["claim1", "claim2", "claim3"])
+fn claims_40(c: &mut Criterion) {
+    benchmark_inner(c, 40)
 }
 
-fn claim_count_20_multiple_selected(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_20_multiple_selected", 20, &["claim1", "claim2", "claim3"])
+fn claims_50(c: &mut Criterion) {
+    benchmark_inner(c, 50)
 }
 
-fn claim_count_30_multiple_selected(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_30_multiple_selected", 30, &["claim10", "claim20", "claim30"])
+fn claims_100(c: &mut Criterion) {
+    benchmark_inner(c, 100)
 }
 
-fn claim_count_200_multiple_selected(c: &mut Criterion) {
-    benchmark_inner(c, "claim_count_200_multiple_selected", 200, &["claim10", "claim20", "claim30"])
+fn claims_150(c: &mut Criterion) {
+    benchmark_inner(c, 150)
 }
 
-criterion_group!(jwt_benches, claim_count_10, claim_count_100, claim_count_200, claim_count_10_multiple_selected, claim_count_20_multiple_selected, claim_count_30_multiple_selected, claim_count_200_multiple_selected);
+fn claims_200(c: &mut Criterion) {
+    benchmark_inner(c, 200)
+}
+
+criterion_group!(
+    jwt_benches,
+    claims_10,
+    claims_20,
+    claims_30,
+    claims_40,
+    claims_50,
+    claims_100,
+    claims_150,
+    claims_200
+);
 criterion_main!(jwt_benches);

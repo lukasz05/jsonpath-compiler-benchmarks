@@ -3,9 +3,8 @@ use std::fmt::Display;
 use std::fs;
 use std::string::FromUtf8Error;
 use thiserror::Error;
-use crate::bindings::{ast_deepest, ast_nested_inner, bestbuy_all_nodes, canada_coord_476_1446_1,
-                      canada_second_coord_component, citm_seat_category, google_map_routes,
-                      inner_array, user_second_mention_index};
+use crate::ondemand_bindings;
+use crate::dom_bindings;
 use crate::framework::implementation::Implementation;
 
 use memmap2::Mmap;
@@ -19,18 +18,34 @@ struct JsonPathCompilerCore<'a> {
 pub struct JsonPathCompilerResult(String);
 
 impl JsonPathCompilerCore<'_> {
-    fn new() -> Result<Self, JsonPathCompilerError> {
+    fn new_ondemand() -> Result<Self, JsonPathCompilerError> {
         Ok(JsonPathCompilerCore {
             query_functions: HashMap::from([
-                ("$.features[*].geometry.coordinates[*][*][1]", canada_second_coord_component as QueryFunction),
-                ("$..coordinates[476][1446][1]", canada_coord_476_1446_1 as QueryFunction),
-                ("$..seatCategoryId", citm_seat_category as QueryFunction),
-                ("$..inner..inner..type.qualType", ast_nested_inner as QueryFunction),
-                ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", ast_deepest as QueryFunction),
-                ("$..*", bestbuy_all_nodes as QueryFunction),
-                ("$[*].routes[*].legs[*].steps[*].distance.text", google_map_routes as QueryFunction),
-                ("$..inner[0]", inner_array as QueryFunction),
-                ("$..entities.user_mentions[1]", user_second_mention_index as QueryFunction)
+                ("$.features[*].geometry.coordinates[*][*][1]", ondemand_bindings::canada_second_coord_component as QueryFunction),
+                ("$..coordinates[476][1446][1]", ondemand_bindings::canada_coord_476_1446_1 as QueryFunction),
+                ("$..seatCategoryId", ondemand_bindings::citm_seat_category as QueryFunction),
+                ("$..inner..inner..type.qualType", ondemand_bindings::ast_nested_inner as QueryFunction),
+                ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", ondemand_bindings::ast_deepest as QueryFunction),
+                ("$..*", ondemand_bindings::bestbuy_all_nodes as QueryFunction),
+                ("$[*].routes[*].legs[*].steps[*].distance.text", ondemand_bindings::google_map_routes as QueryFunction),
+                ("$..inner[0]", ondemand_bindings::inner_array as QueryFunction),
+                ("$..entities.user_mentions[1]", ondemand_bindings::user_second_mention_index as QueryFunction)
+            ])
+        })
+    }
+
+    fn new_dom() -> Result<Self, JsonPathCompilerError> {
+        Ok(JsonPathCompilerCore {
+            query_functions: HashMap::from([
+                ("$.features[*].geometry.coordinates[*][*][1]", dom_bindings::canada_second_coord_component as QueryFunction),
+                ("$..coordinates[476][1446][1]", dom_bindings::canada_coord_476_1446_1 as QueryFunction),
+                ("$..seatCategoryId", dom_bindings::citm_seat_category as QueryFunction),
+                ("$..inner..inner..type.qualType", dom_bindings::ast_nested_inner as QueryFunction),
+                ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", dom_bindings::ast_deepest as QueryFunction),
+                ("$..*", dom_bindings::bestbuy_all_nodes as QueryFunction),
+                ("$[*].routes[*].legs[*].steps[*].distance.text", dom_bindings::google_map_routes as QueryFunction),
+                ("$..inner[0]", dom_bindings::inner_array as QueryFunction),
+                ("$..entities.user_mentions[1]", dom_bindings::user_second_mention_index as QueryFunction)
             ])
         })
     }
@@ -68,11 +83,11 @@ pub enum JsonPathCompilerError {
     UnrecognizedQuery(String)
 }
 
-pub struct JsonPathCompiler<'a> {
+pub struct JsonPathCompilerOndemand<'a> {
     core: JsonPathCompilerCore<'a>,
 }
 
-impl Implementation for JsonPathCompiler<'_> {
+impl Implementation for JsonPathCompilerOndemand<'_> {
     type Query = QueryFunction;
 
     type File = Vec<u8>;
@@ -86,8 +101,8 @@ impl Implementation for JsonPathCompiler<'_> {
     }
 
     fn new() -> Result<Self, Self::Error> {
-        Ok(JsonPathCompiler {
-            core: JsonPathCompilerCore::new()?
+        Ok(JsonPathCompilerOndemand {
+            core: JsonPathCompilerCore::new_ondemand()?
         })
     }
 
@@ -108,11 +123,11 @@ impl Implementation for JsonPathCompiler<'_> {
     }
 }
 
-pub struct JsonPathCompilerMmap<'a> {
+pub struct JsonPathCompilerOndemandMmap<'a> {
     core: JsonPathCompilerCore<'a>,
 }
 
-impl Implementation for JsonPathCompilerMmap<'_> {
+impl Implementation for JsonPathCompilerOndemandMmap<'_> {
     type Query = QueryFunction;
 
     type File = Mmap;
@@ -126,8 +141,8 @@ impl Implementation for JsonPathCompilerMmap<'_> {
     }
 
     fn new() -> Result<Self, Self::Error> {
-        Ok(JsonPathCompilerMmap {
-            core: JsonPathCompilerCore::new()?
+        Ok(JsonPathCompilerOndemandMmap {
+            core: JsonPathCompilerCore::new_ondemand()?
         })
     }
 
@@ -148,3 +163,42 @@ impl Implementation for JsonPathCompilerMmap<'_> {
     }
 }
 
+pub struct JsonPathCompilerDom<'a> {
+    core: JsonPathCompilerCore<'a>,
+}
+
+impl Implementation for JsonPathCompilerDom<'_> {
+    type Query = QueryFunction;
+
+    type File = Vec<u8>;
+
+    type Error = JsonPathCompilerError;
+
+    type Result<'a> = JsonPathCompilerResult;
+
+    fn id() -> &'static str {
+        "jsonpath_compiler_dom"
+    }
+
+    fn new() -> Result<Self, Self::Error> {
+        Ok(JsonPathCompilerDom {
+            core: JsonPathCompilerCore::new_dom()?
+        })
+    }
+
+    fn load_file(&self, file_path: &str) -> Result<Self::File, Self::Error> {
+        let file = fs::read_to_string(file_path)?;
+        let input = file.into_bytes();
+        let padding = vec![0; 64];
+        let padded_input = input.into_iter().chain(padding).collect();
+        Ok(padded_input)
+    }
+
+    fn compile_query(&self, query: &str) -> Result<Self::Query, Self::Error> {
+        self.core.compile_query(query)
+    }
+
+    fn run<'a>(&self, query: &'a Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
+        self.core.run(query, file)
+    }
+}

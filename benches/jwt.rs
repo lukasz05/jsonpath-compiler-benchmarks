@@ -2,7 +2,7 @@ use std::cmp::min;
 use criterion::{Criterion, criterion_group, criterion_main};
 use serde_json::Value;
 use uuid::Uuid;
-use rsonpath_benchmarks::bindings::{
+use rsonpath_benchmarks::ondemand_bindings::{
     claim1,
     claim2,
     claim3,

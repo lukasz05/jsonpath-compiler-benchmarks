@@ -77,7 +77,8 @@ pub fn ast_deepest(c: &mut Criterion) -> Result<(), BenchmarkError> {
         .do_not_measure_file_load_time()
         .add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
         .add_target(BenchTarget::JSurfer(query))?
-        .add_target(BenchTarget::JsonPathCompiler(query))?
+        .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
+        .add_target(BenchTarget::JsonPathCompilerDom(query))?
         .finish();
 
     benchset.run(c);
@@ -260,7 +261,6 @@ benchsets!(
     canada_second_coord_component,
     canada_coord_476_1446_1,
     //canada_coord_slice_100_to_200,
-    canada_second_coord_component,
     citm_seat_category,
     ast_nested_inner,
     ast_deepest,

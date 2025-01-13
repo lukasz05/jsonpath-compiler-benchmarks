@@ -152,6 +152,28 @@ fn claims_200(c: &mut Criterion) {
     benchmark_inner(c, 200)
 }
 
+fn single_claim_growing_payload(c: &mut Criterion) {
+    let mut group = c.benchmark_group("single_claim_growing_payload".to_string());
+
+    for payload_claim_count_size in (10..201).step_by(10) {
+        let json = JWTPayloadGenerator::new(payload_claim_count_size).generate();
+        let json_bytes = json.to_string().into_bytes();
+        let padding = vec![0; 64];
+        let padded_payload_bytes: Vec<u8> = json_bytes.into_iter().chain(padding).collect();
+        let selected_claims: Vec<String> = vec!["claim1".to_string()];
+        group.bench_function(
+            format!("serde_json_{payload_claim_count_size}"),
+            |b| b.iter(|| serde_get_claim(&json, &selected_claims))
+        );
+        group.bench_function(
+            format!("jsonpath_compiler_{payload_claim_count_size}"),
+            |b| b.iter(|| jsonpath_compiler_get_claim(&padded_payload_bytes, &selected_claims))
+        );
+    }
+
+    group.finish();
+}
+
 criterion_group!(
     jwt_benches,
     claims_10,
@@ -161,6 +183,7 @@ criterion_group!(
     claims_50,
     claims_100,
     claims_150,
-    claims_200
+    claims_200,
+    single_claim_growing_payload
 );
 criterion_main!(jwt_benches);

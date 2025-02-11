@@ -35,13 +35,22 @@ fn setup_jsurfer() -> Result<()> {
 
 fn compile_queries() -> Result<()> {
     cc::Build::new()
-        .file("src/queries.cpp")
+        .file("src/ondemand_queries.cpp")
         .cpp(true)
         .std("c++20")
         .opt_level(3)
-        .include("/opt/homebrew/Cellar/simdjson/3.10.1/include")
-        .compile("queries");
-    println!("cargo:rustc-link-search=/opt/homebrew/Cellar/simdjson/3.10.1/lib");
+        .include("/opt/homebrew/Cellar/simdjson/3.11.5/include")
+        .warnings(false)
+        .compile("ondemand_queries");
+    cc::Build::new()
+        .file("src/dom_queries.cpp")
+        .cpp(true)
+        .std("c++20")
+        .opt_level(3)
+        .include("/opt/homebrew/Cellar/simdjson/3.11.5/include")
+        .warnings(false)
+        .compile("dom_queries");
+    println!("cargo:rustc-link-search=/opt/homebrew/Cellar/simdjson/3.11.5/lib");
     println!("cargo:rustc-link-arg=-lsimdjson");
     Ok(())
 }

@@ -6,7 +6,7 @@ import math
 from collections import namedtuple
 from typing import List
 
-criterion_path = "/Users/lukasz/source/jsonpath-compiler-benchmarks/target/criterion"
+criterion_path = ""
 
 benchmark_groups = [
     {
@@ -101,7 +101,7 @@ def plot_benchmark_group(group):
                               for benchmark in benchmarks]
     ax.set_xticks(x + width * 2, benchmarks_short_names)
     ax.legend(loc="best", ncols=1)
-    ax.set_ylim(0, (((max_measurement + 300) // 500) + 1) * 500)
+    ax.set_ylim(0, (((max_measurement + 100) // 500) + 1) * 500)
     plt.savefig(group["name"] + ".png")
 
 

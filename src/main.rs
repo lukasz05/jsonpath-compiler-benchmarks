@@ -1,7 +1,7 @@
 use clap::{Parser, ValueEnum};
 use color_eyre::eyre::Result;
-use rsonpath_benchmarks::framework::implementation::Implementation;
-use rsonpath_benchmarks::implementations::{
+use jsonpath_compiler_benchmarks::framework::implementation::Implementation;
+use jsonpath_compiler_benchmarks::implementations::{
     jsonpath_rust::JsonpathRust, rsonpath::RsonpathMmap, rust_jsurfer::JSurfer, serde_json_path::SerdeJsonPath,
 };
 

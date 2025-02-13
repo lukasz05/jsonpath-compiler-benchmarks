@@ -13,7 +13,11 @@ use criterion::{Criterion, Throughput};
 use implementation::{Implementation, PreparedQuery};
 use std::{path::PathBuf, time::Duration};
 use thiserror::Error;
-use crate::implementations::jsonpath_compiler::{JsonPathCompilerOndemand, JsonPathCompilerOndemandMmap, JsonPathCompilerError, JsonPathCompilerDom};
+use crate::implementations::jsonpath_compiler::{JsonPathCompilerOndemand,
+                                                JsonPathCompilerOndemandMmap,
+                                                JsonPathCompilerError,
+                                                JsonPathCompilerDom};
+use crate::implementations::jsonstream::{JsonStream, JsonStreamError};
 
 pub mod benchmark_options;
 pub mod implementation;
@@ -23,12 +27,12 @@ pub enum BenchTarget<'q> {
     RsonpathMmap(&'q str, ResultType),
     Rsonpath(&'q str, ResultType),
     JSurfer(&'q str),
+    JsonStream(&'q str),
     JsonpathRust(&'q str),
     SerdeJsonPath(&'q str),
     JsonPathCompilerOndemandMmap(&'q str),
     JsonPathCompilerOndemand(&'q str),
     JsonPathCompilerDom(&'q str)
-
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -164,10 +168,19 @@ impl Benchset {
     pub fn add_all_targets(self, query: &str) -> Result<Self, BenchmarkError> {
         self.add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
             .add_target(BenchTarget::JSurfer(query))?
+            .add_target(BenchTarget::JsonStream(query))?
             .add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
             .add_target(BenchTarget::JsonPathCompilerDom(query))
+    }
+
+    pub fn add_all_targets_supporting_filters(self, query: &str) -> Result<Self, BenchmarkError> {
+        self.add_target(BenchTarget::JSurfer(query))?
+            .add_target(BenchTarget::JsonStream(query))?
+            .add_target(BenchTarget::JsonpathRust(query))?
+            .add_target(BenchTarget::SerdeJsonPath(query))?
+            .add_target(BenchTarget::JsonPathCompilerOndemand(query))
     }
 
     pub fn finish(self) -> ConfiguredBenchset {
@@ -223,6 +236,11 @@ impl<'a> Target for BenchTarget<'a> {
             BenchTarget::JSurfer(q) => {
                 let jsurfer = JSurfer::new()?;
                 let prepared = prepare(jsurfer, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonStream(q) => {
+                let jsonstream = JsonStream::new()?;
+                let prepared = prepare(jsonstream, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonpathRust(q) => {
@@ -284,6 +302,11 @@ impl<'a> Target for BenchTarget<'a> {
             BenchTarget::JSurfer(q) => {
                 let jsurfer = JSurfer::new()?;
                 let prepared = prepare_with_id(jsurfer, id, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonStream(q) => {
+                let jsonstream = JsonStream::new()?;
+                let prepared = prepare_with_id(jsonstream, id, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonpathRust(q) => {
@@ -406,6 +429,12 @@ pub enum BenchmarkError {
         #[source]
         #[from]
         JSurferError,
+    ),
+    #[error("error preparing JsonStream bench: {0}")]
+    JsonStreamError(
+        #[source]
+        #[from]
+        JsonStreamError,
     ),
     #[error("error preparing JsonpathRust bench: {0}")]
     JsonpathRust(

@@ -3,3 +3,6 @@
 /data/*
 Cargo.lock
 !/data/small
+criterion*
+.idea
+*.png

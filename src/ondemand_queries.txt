@@ -7,6 +7,7 @@ bestbuy_all_nodes $..*
 google_map_routes $[*].routes[*].legs[*].steps[*].distance.text
 inner_array $..inner[0]
 user_second_mention_index $..entities.user_mentions[1]
+retweet_count_58 $.statuses[?(@.retweet_count == 58)]
 claim1 $.claim1
 claim2 $.claim2
 claim3 $.claim3

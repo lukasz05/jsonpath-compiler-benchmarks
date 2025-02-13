@@ -1,7 +1,7 @@
-use rsonpath_benchmarks::prelude::*;
+use jsonpath_compiler_benchmarks::prelude::*;
 
 pub fn canada_second_coord_component(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset: rsonpath_benchmarks::framework::ConfiguredBenchset =
+    let benchset: jsonpath_compiler_benchmarks::framework::ConfiguredBenchset =
         Benchset::new("canada::second_coord_component", dataset::nativejson_canada())?
             .do_not_measure_file_load_time()
             .add_all_targets("$.features[*].geometry.coordinates[*][*][1]")?
@@ -13,7 +13,7 @@ pub fn canada_second_coord_component(c: &mut Criterion) -> Result<(), BenchmarkE
 }
 
 pub fn canada_coord_476_1446_1(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset: rsonpath_benchmarks::framework::ConfiguredBenchset =
+    let benchset: jsonpath_compiler_benchmarks::framework::ConfiguredBenchset =
         Benchset::new("canada::coord_476_1446_1", dataset::nativejson_canada())?
             .do_not_measure_file_load_time()
             .add_all_targets("$..coordinates[476][1446][1]")?
@@ -25,7 +25,7 @@ pub fn canada_coord_476_1446_1(c: &mut Criterion) -> Result<(), BenchmarkError> 
 }
 
 // pub fn canada_coord_slice_100_to_200(c: &mut Criterion) -> Result<(), BenchmarkError> {
-//     let benchset: rsonpath_benchmarks::framework::ConfiguredBenchset =
+//     let benchset: jsonpath_compiler_benchmarks::framework::ConfiguredBenchset =
 //         Benchset::new("canada::coord_slice_100_to_200", dataset::nativejson_canada())?
 //             .do_not_measure_file_load_time()
 //             .add_all_targets("$..coordinates[100:201][*][*]")?
@@ -37,7 +37,7 @@ pub fn canada_coord_476_1446_1(c: &mut Criterion) -> Result<(), BenchmarkError> 
 // }
 
 // pub fn canada_coord_slice_overlapping(c: &mut Criterion) -> Result<(), BenchmarkError> {
-//     let benchset: rsonpath_benchmarks::framework::ConfiguredBenchset =
+//     let benchset: jsonpath_compiler_benchmarks::framework::ConfiguredBenchset =
 //         Benchset::new("canada::coord_slice_overlapping", dataset::nativejson_canada())?
 //             .do_not_measure_file_load_time()
 //             .add_all_targets("$..coordinates[5::7][3::10][*]")?
@@ -49,7 +49,7 @@ pub fn canada_coord_476_1446_1(c: &mut Criterion) -> Result<(), BenchmarkError> 
 // }
 
 pub fn citm_seat_category(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset: rsonpath_benchmarks::framework::ConfiguredBenchset =
+    let benchset: jsonpath_compiler_benchmarks::framework::ConfiguredBenchset =
         Benchset::new("citm::seatCategoryId", dataset::nativejson_citm())?
             .do_not_measure_file_load_time()
             .add_all_targets("$..seatCategoryId")?
@@ -245,6 +245,17 @@ pub fn user_second_mention_index(c: &mut Criterion) -> Result<(), BenchmarkError
     Ok(())
 }
 
+pub fn retweet_count_58(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("retweet_count_58", dataset::twitter())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$.statuses[?(@.retweet_count == 58)]")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
 // pub fn all_first_index(c: &mut Criterion) -> Result<(), BenchmarkError> {
 //     let benchset = Benchset::new("all_first_index", dataset::twitter())?
 //         .do_not_measure_file_load_time()
@@ -258,6 +269,7 @@ pub fn user_second_mention_index(c: &mut Criterion) -> Result<(), BenchmarkError
 
 benchsets!(
     main_benches,
+    retweet_count_58,
     canada_second_coord_component,
     canada_coord_476_1446_1,
     //canada_coord_slice_100_to_200,

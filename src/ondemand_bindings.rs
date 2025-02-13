@@ -19,6 +19,8 @@ extern "C" {
 
     fn user_second_mention_index_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
 
+    fn retweet_count_58_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
+
     fn claim1_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
 
     fn claim2_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
@@ -163,6 +165,18 @@ pub fn user_second_mention_index(padded_input: &[u8]) -> String {
     let mut result_length: usize = 0;
     unsafe {
         let result_ptr: *mut u8 = user_second_mention_index_binding(input_ptr, padded_input.len(), &mut result_length);
+        let result_slice = std::slice::from_raw_parts(result_ptr, result_length);
+        let result_str = String::from_utf8_unchecked(result_slice.to_vec());
+        free_result_buffer(result_ptr);
+        result_str
+    }
+}
+
+pub fn retweet_count_58(padded_input: &[u8]) -> String {
+    let input_ptr = padded_input.as_ptr();
+    let mut result_length: usize = 0;
+    unsafe {
+        let result_ptr: *mut u8 = retweet_count_58_binding(input_ptr, padded_input.len(), &mut result_length);
         let result_slice = std::slice::from_raw_parts(result_ptr, result_length);
         let result_str = String::from_utf8_unchecked(result_slice.to_vec());
         free_result_buffer(result_ptr);

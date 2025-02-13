@@ -29,7 +29,8 @@ impl JsonPathCompilerCore<'_> {
                 ("$..*", ondemand_bindings::bestbuy_all_nodes as QueryFunction),
                 ("$[*].routes[*].legs[*].steps[*].distance.text", ondemand_bindings::google_map_routes as QueryFunction),
                 ("$..inner[0]", ondemand_bindings::inner_array as QueryFunction),
-                ("$..entities.user_mentions[1]", ondemand_bindings::user_second_mention_index as QueryFunction)
+                ("$..entities.user_mentions[1]", ondemand_bindings::user_second_mention_index as QueryFunction),
+                ("$.statuses[?(@.retweet_count == 58)]", ondemand_bindings::retweet_count_58 as QueryFunction),
             ])
         })
     }

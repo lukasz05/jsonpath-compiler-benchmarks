@@ -31,6 +31,11 @@ impl JsonPathCompilerCore<'_> {
                 ("$..inner[0]", ondemand_bindings::inner_array as QueryFunction),
                 ("$..entities.user_mentions[1]", ondemand_bindings::user_second_mention_index as QueryFunction),
                 ("$.statuses[?(@.retweet_count == 58)]", ondemand_bindings::retweet_count_58 as QueryFunction),
+                ("$.statuses[?(@.retweet_count > 58)]", ondemand_bindings::retweet_count_gt_58 as QueryFunction),
+                ("$.statuses[?(@.retweet_count >= 1)]", ondemand_bindings::retweet_count_gte_1 as QueryFunction),
+                ("$..[?(@.text == \"abc\")]", ondemand_bindings::twitter_text_abc as QueryFunction),
+                ("$..[?(@.text)]", ondemand_bindings::twitter_text_exists as QueryFunction),
+                ("$[?(@[0].geometry.coordinates[0][13][1] && @[0].geometry.coordinates[48][20][1] && @[0].geometry.coordinates[96][12][1] && @[0].geometry.coordinates[144][22][1] && @[0].geometry.coordinates[192][32][1] && @[0].geometry.coordinates[240][18][1] && @[0].geometry.coordinates[288][19][1] && @[0].geometry.coordinates[336][54][1] && @[0].geometry.coordinates[384][18][1] && @[0].geometry.coordinates[432][71][1])]", ondemand_bindings::canada_multiple_subqueries as QueryFunction),
             ])
         })
     }

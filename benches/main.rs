@@ -245,17 +245,6 @@ pub fn user_second_mention_index(c: &mut Criterion) -> Result<(), BenchmarkError
     Ok(())
 }
 
-pub fn retweet_count_58(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset = Benchset::new("retweet_count_58", dataset::twitter())?
-        .do_not_measure_file_load_time()
-        .add_all_targets_supporting_filters("$.statuses[?(@.retweet_count == 58)]")?
-        .finish();
-
-    benchset.run(c);
-
-    Ok(())
-}
-
 // pub fn all_first_index(c: &mut Criterion) -> Result<(), BenchmarkError> {
 //     let benchset = Benchset::new("all_first_index", dataset::twitter())?
 //         .do_not_measure_file_load_time()
@@ -269,7 +258,6 @@ pub fn retweet_count_58(c: &mut Criterion) -> Result<(), BenchmarkError> {
 
 benchsets!(
     main_benches,
-    retweet_count_58,
     canada_second_coord_component,
     canada_coord_476_1446_1,
     //canada_coord_slice_100_to_200,

@@ -1,0 +1,4 @@
+github.com/arnodel/grammar v0.0.0-20211030100909-fff725e3d446 h1:ynK48MoQBerg1Oe6qwcij8gBS9aqNc0ypVePnpsngVk=
+github.com/arnodel/grammar v0.0.0-20211030100909-fff725e3d446/go.mod h1:AGts2EYJ2mFxv69ntiJGTJBZrW+SxyvCsSRwihu8h0E=
+github.com/arnodel/jsonstream v0.0.0-20250127084819-b708ef71d2ab h1:1tWSbWEcHk0pMBPJLfmrioDvudOCRZEiuxvfNKlGkaQ=
+github.com/arnodel/jsonstream v0.0.0-20250127084819-b708ef71d2ab/go.mod h1:Oe3FP8/KCwoF8WPkVAiWHeq8Rs8YvWzJn44arA0J0Oo=

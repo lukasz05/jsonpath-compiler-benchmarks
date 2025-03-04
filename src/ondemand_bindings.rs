@@ -29,7 +29,13 @@ extern "C" {
 
     fn twitter_text_exists_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
 
+    fn status_with_id_screen_name_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
+
     fn canada_multiple_subqueries_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
+
+    fn canada_consecutive_filter_segments_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
+
+    fn canada_interleaved_filter_segments_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
 
     fn claim1_binding(padded_input: *const u8, input_length: usize, result_length: *mut usize) -> *mut u8;
 
@@ -242,11 +248,47 @@ pub fn twitter_text_exists(padded_input: &[u8]) -> String {
     }
 }
 
+pub fn status_with_id_screen_name(padded_input: &[u8]) -> String {
+    let input_ptr = padded_input.as_ptr();
+    let mut result_length: usize = 0;
+    unsafe {
+        let result_ptr: *mut u8 = status_with_id_screen_name_binding(input_ptr, padded_input.len(), &mut result_length);
+        let result_slice = std::slice::from_raw_parts(result_ptr, result_length);
+        let result_str = String::from_utf8_unchecked(result_slice.to_vec());
+        free_result_buffer(result_ptr);
+        result_str
+    }
+}
+
 pub fn canada_multiple_subqueries(padded_input: &[u8]) -> String {
     let input_ptr = padded_input.as_ptr();
     let mut result_length: usize = 0;
     unsafe {
         let result_ptr: *mut u8 = canada_multiple_subqueries_binding(input_ptr, padded_input.len(), &mut result_length);
+        let result_slice = std::slice::from_raw_parts(result_ptr, result_length);
+        let result_str = String::from_utf8_unchecked(result_slice.to_vec());
+        free_result_buffer(result_ptr);
+        result_str
+    }
+}
+
+pub fn canada_consecutive_filter_segments(padded_input: &[u8]) -> String {
+    let input_ptr = padded_input.as_ptr();
+    let mut result_length: usize = 0;
+    unsafe {
+        let result_ptr: *mut u8 = canada_consecutive_filter_segments_binding(input_ptr, padded_input.len(), &mut result_length);
+        let result_slice = std::slice::from_raw_parts(result_ptr, result_length);
+        let result_str = String::from_utf8_unchecked(result_slice.to_vec());
+        free_result_buffer(result_ptr);
+        result_str
+    }
+}
+
+pub fn canada_interleaved_filter_segments(padded_input: &[u8]) -> String {
+    let input_ptr = padded_input.as_ptr();
+    let mut result_length: usize = 0;
+    unsafe {
+        let result_ptr: *mut u8 = canada_interleaved_filter_segments_binding(input_ptr, padded_input.len(), &mut result_length);
         let result_slice = std::slice::from_raw_parts(result_ptr, result_length);
         let result_str = String::from_utf8_unchecked(result_slice.to_vec());
         free_result_buffer(result_ptr);

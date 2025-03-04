@@ -55,10 +55,43 @@ pub fn twitter_text_exists(c: &mut Criterion) -> Result<(), BenchmarkError> {
     Ok(())
 }
 
+pub fn status_with_id_screen_name(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("status_with_id_screen_name", dataset::twitter())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$.statuses[?@.id == 505874873961308160].entities.user_mentions[0].screen_name")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
 pub fn canada_multiple_subqueries(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("canada_multiple_subqueries", dataset::nativejson_canada())?
         .do_not_measure_file_load_time()
         .add_all_targets_supporting_filters("$[?(@[0].geometry.coordinates[0][13][1] && @[0].geometry.coordinates[48][20][1] && @[0].geometry.coordinates[96][12][1] && @[0].geometry.coordinates[144][22][1] && @[0].geometry.coordinates[192][32][1] && @[0].geometry.coordinates[240][18][1] && @[0].geometry.coordinates[288][19][1] && @[0].geometry.coordinates[336][54][1] && @[0].geometry.coordinates[384][18][1] && @[0].geometry.coordinates[432][71][1])]")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
+pub fn canada_consecutive_filter_segments(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("canada_consecutive_filter_segments", dataset::nativejson_canada())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$[?@[0]][?@.geometry][?@.coordinates][?@[479]][?@[5275]][5275][1]")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
+pub fn canada_interleaved_filter_segments(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("canada_interleaved_filter_segments", dataset::nativejson_canada())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$[?@[0]][0][?@.coordinates][\"coordinates\"][?@[5275]][5275][1]")?
         .finish();
 
     benchset.run(c);
@@ -73,5 +106,8 @@ benchsets!(
     retweet_count_gte_1,
     twitter_text_abc,
     twitter_text_exists,
+    status_with_id_screen_name,
     canada_multiple_subqueries
+    canada_consecutive_filter_segments,
+    canada_interleaved_filter_segments
 );

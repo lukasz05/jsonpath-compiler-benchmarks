@@ -2,17 +2,18 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::fs;
 use std::string::FromUtf8Error;
-use thiserror::Error;
-use crate::ondemand_bindings;
-use crate::dom_bindings;
-use crate::framework::implementation::Implementation;
 
 use memmap2::Mmap;
+use thiserror::Error;
+
+use crate::dom_bindings;
+use crate::framework::implementation::Implementation;
+use crate::ondemand_bindings;
 
 type QueryFunction = fn(&[u8]) -> String;
 
 struct JsonPathCompilerCore<'a> {
-    query_functions: HashMap<&'a str, QueryFunction>
+    query_functions: HashMap<&'a str, QueryFunction>,
 }
 
 pub struct JsonPathCompilerResult(String);
@@ -35,7 +36,10 @@ impl JsonPathCompilerCore<'_> {
                 ("$.statuses[?(@.retweet_count >= 1)]", ondemand_bindings::retweet_count_gte_1 as QueryFunction),
                 ("$..[?(@.text == \"abc\")]", ondemand_bindings::twitter_text_abc as QueryFunction),
                 ("$..[?(@.text)]", ondemand_bindings::twitter_text_exists as QueryFunction),
+                ("$.statuses[?@.id == 505874873961308160].entities.user_mentions[0].screen_name", ondemand_bindings::status_with_id_screen_name as QueryFunction),
                 ("$[?(@[0].geometry.coordinates[0][13][1] && @[0].geometry.coordinates[48][20][1] && @[0].geometry.coordinates[96][12][1] && @[0].geometry.coordinates[144][22][1] && @[0].geometry.coordinates[192][32][1] && @[0].geometry.coordinates[240][18][1] && @[0].geometry.coordinates[288][19][1] && @[0].geometry.coordinates[336][54][1] && @[0].geometry.coordinates[384][18][1] && @[0].geometry.coordinates[432][71][1])]", ondemand_bindings::canada_multiple_subqueries as QueryFunction),
+                ("$[?@[0]][?@.geometry][?@.coordinates][?@[479]][?@[5275]][5275][1]", ondemand_bindings::canada_consecutive_filter_segments as QueryFunction),
+                ("$[?@[0]][0][?@.coordinates][\"coordinates\"][?@[5275]][5275][1]", ondemand_bindings::canada_interleaved_filter_segments as QueryFunction)
             ])
         })
     }
@@ -86,7 +90,7 @@ pub enum JsonPathCompilerError {
     #[error(transparent)]
     Utf8Error(#[from] FromUtf8Error),
     #[error("Unrecognized query: '{0}'")]
-    UnrecognizedQuery(String)
+    UnrecognizedQuery(String),
 }
 
 pub struct JsonPathCompilerOndemand<'a> {

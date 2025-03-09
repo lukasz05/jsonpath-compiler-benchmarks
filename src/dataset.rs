@@ -411,6 +411,72 @@ pub const fn pison_google_map_short() -> Dataset {
     }
 }
 
+pub fn pison_google_map_sized(size: usize) -> Dataset {
+    match size {
+        1 => Dataset {
+            name: "google_map_1",
+            path: dataset_path!("pison/google_map_1.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("e0b63d2d9dd878aa8c344b0d8df349e9536186009f72dacddcc43ce9135dbceb")
+        },
+        2 => Dataset {
+            name: "google_map_2",
+            path: dataset_path!("pison/google_map_2.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("8b9db31cbc69dc8ab7e1d75808175d4fff852602b529f50c35f0d42adf9da2ce")
+        },
+        3 => Dataset {
+            name: "google_map_3",
+            path: dataset_path!("pison/google_map_3.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("eb0107a0674761e9b4180deab1650032d49f94f7d842375746e6d39a2ce5e20b")
+        },
+        4 => Dataset {
+            name: "google_map_4",
+            path: dataset_path!("pison/google_map_4.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("897f38b248cdb83131938feb970db89352edaaf142228df2c45562ddd52d63ba")
+        },
+        5 => Dataset {
+            name: "google_map_5",
+            path: dataset_path!("pison/google_map_5.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("15de55c3636e4d4c8499ad8c01997327048b336c7bb0117ed0b1949a08f3fd18")
+        },
+        6 => Dataset {
+            name: "google_map_6",
+            path: dataset_path!("pison/google_map_6.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("68e25147a6fc942351b7b4f909e9d96ca3785ebe663cdc702327c03bea064117")
+        },
+        7 => Dataset {
+            name: "google_map_7",
+            path: dataset_path!("pison/google_map_7.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("8ccd7c8c9b914c742121dc6e38a8ca5b59d7001c04276c94f6eb93072c2f5a4d")
+        },
+        8 => Dataset {
+            name: "google_map_8",
+            path: dataset_path!("pison/google_map_8.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("a5fc2743261a8d24a57e30ffc72e34a47cef14162e8831d3c87e4dc271133fbe")
+        },
+        9 => Dataset {
+            name: "google_map_9",
+            path: dataset_path!("pison/google_map_9.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("0548a7e59440a8baf2a7d169372b8a7d6521f39b747ab7f927c147a54f287fd3")
+        },
+        10 => Dataset {
+            name: "google_map_10",
+            path: dataset_path!("pison/google_map_10.json"),
+            source: DatasetSource::LocalJson,
+            checksum: hex!("5b04822b6468ca5a7dd4bd326f4224d67816d0308c738ea28885d8045ca7dc5e")
+        },
+        _ => panic!("unsupported dataset pison_google_map_sized{size}"),
+    }
+}
+
 pub const fn pison_nspl() -> Dataset {
     Dataset {
         name: "pison_nspl",

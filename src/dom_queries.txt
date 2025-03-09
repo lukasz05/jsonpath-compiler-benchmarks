@@ -5,6 +5,7 @@ dom_ast_nested_inner $..inner..inner..type.qualType
 dom_ast_deepest $..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*
 dom_bestbuy_all_nodes $..*
 dom_google_map_routes $[*].routes[*].legs[*].steps[*].distance.text
+dom_google_map_travel_modes $[*].available_travel_modes
 dom_inner_array $..inner[0]
 dom_user_second_mention_index $..entities.user_mentions[1]
 dom_claim1 $.claim1

@@ -7,7 +7,7 @@ use memmap2::Mmap;
 use thiserror::Error;
 
 use crate::dom_bindings;
-use crate::framework::implementation::Implementation;
+use crate::framework::implementation::{Implementation, Query};
 use crate::ondemand_bindings;
 
 type QueryFunction = fn(&[u8]) -> String;
@@ -29,6 +29,7 @@ impl JsonPathCompilerCore<'_> {
                 ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", ondemand_bindings::ast_deepest as QueryFunction),
                 ("$..*", ondemand_bindings::bestbuy_all_nodes as QueryFunction),
                 ("$[*].routes[*].legs[*].steps[*].distance.text", ondemand_bindings::google_map_routes as QueryFunction),
+                ("$[*].available_travel_modes", ondemand_bindings::google_map_travel_modes as QueryFunction),
                 ("$..inner[0]", ondemand_bindings::inner_array as QueryFunction),
                 ("$..entities.user_mentions[1]", ondemand_bindings::user_second_mention_index as QueryFunction),
                 ("$.statuses[?(@.retweet_count == 58)]", ondemand_bindings::retweet_count_58 as QueryFunction),
@@ -54,6 +55,7 @@ impl JsonPathCompilerCore<'_> {
                 ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", dom_bindings::ast_deepest as QueryFunction),
                 ("$..*", dom_bindings::bestbuy_all_nodes as QueryFunction),
                 ("$[*].routes[*].legs[*].steps[*].distance.text", dom_bindings::google_map_routes as QueryFunction),
+                ("$[*].available_travel_modes", dom_bindings::google_map_travel_modes as QueryFunction),
                 ("$..inner[0]", dom_bindings::inner_array as QueryFunction),
                 ("$..entities.user_mentions[1]", dom_bindings::user_second_mention_index as QueryFunction)
             ])

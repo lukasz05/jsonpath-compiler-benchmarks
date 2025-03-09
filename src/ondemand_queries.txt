@@ -5,6 +5,7 @@ ast_nested_inner $..inner..inner..type.qualType
 ast_deepest $..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*
 bestbuy_all_nodes $..*
 google_map_routes $[*].routes[*].legs[*].steps[*].distance.text
+google_map_travel_modes $[*].available_travel_modes
 inner_array $..inner[0]
 user_second_mention_index $..entities.user_mentions[1]
 retweet_count_58 $.statuses[?(@.retweet_count == 58)]

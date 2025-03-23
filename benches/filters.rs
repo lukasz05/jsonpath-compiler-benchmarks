@@ -100,14 +100,14 @@ pub fn canada_interleaved_filter_segments(c: &mut Criterion) -> Result<(), Bench
 }
 
 benchsets!(
-    filter_benches,
+    filters,
     retweet_count_58,
     retweet_count_gt_58,
     retweet_count_gte_1,
     twitter_text_abc,
     twitter_text_exists,
     status_with_id_screen_name,
-    canada_multiple_subqueries
+    canada_multiple_subqueries,
     canada_consecutive_filter_segments,
     canada_interleaved_filter_segments
 );

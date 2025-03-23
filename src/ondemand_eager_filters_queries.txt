@@ -1,0 +1,40 @@
+ondemand_eager_filters_canada_second_coord_component $.features[*].geometry.coordinates[*][*][1]
+ondemand_eager_filters_canada_coord_476_1446_1 $..coordinates[476][1446][1]
+ondemand_eager_filters_citm_seat_category $..seatCategoryId
+ondemand_eager_filters_ast_nested_inner $..inner..inner..type.qualType
+ondemand_eager_filters_ast_deepest $..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*
+ondemand_eager_filters_bestbuy_all_nodes $..*
+ondemand_eager_filters_google_map_routes $[*].routes[*].legs[*].steps[*].distance.text
+ondemand_eager_filters_google_map_travel_modes $[*].available_travel_modes
+ondemand_eager_filters_inner_array $..inner[0]
+ondemand_eager_filters_user_second_mention_index $..entities.user_mentions[1]
+ondemand_eager_filters_retweet_count_58 $.statuses[?(@.retweet_count == 58)]
+ondemand_eager_filters_retweet_count_gt_58 $.statuses[?(@.retweet_count > 58)]
+ondemand_eager_filters_retweet_count_gte_1 $.statuses[?(@.retweet_count >= 1)]
+ondemand_eager_filters_twitter_text_abc $..[?(@.text == "abc")]
+ondemand_eager_filters_twitter_text_exists $..[?(@.text)]
+ondemand_eager_filters_twitter_consecutive_descendant_filter_segments $..[?@.retweet_count == 58]..[?@.id != 2745121514]
+ondemand_eager_filters_status_with_id_screen_name $.statuses[?@.id == 505874873961308160].entities.user_mentions[0].screen_name
+ondemand_eager_filters_canada_multiple_subqueries $[?(@[0].geometry.coordinates[0][13][1] && @[0].geometry.coordinates[48][20][1] && @[0].geometry.coordinates[96][12][1] && @[0].geometry.coordinates[144][22][1] && @[0].geometry.coordinates[192][32][1] && @[0].geometry.coordinates[240][18][1] && @[0].geometry.coordinates[288][19][1] && @[0].geometry.coordinates[336][54][1] && @[0].geometry.coordinates[384][18][1] && @[0].geometry.coordinates[432][71][1])]
+ondemand_eager_filters_canada_consecutive_filter_segments $[?@[0]][?@.geometry][?@.coordinates][?@[479]][?@[5275]][5275][1]
+ondemand_eager_filters_canada_interleaved_filter_segments $[?@[0]][0][?@.coordinates]["coordinates"][?@[5275]][5275][1]
+ondemand_eager_filters_claim1 $.claim1
+ondemand_eager_filters_claim2 $.claim2
+ondemand_eager_filters_claim3 $.claim3
+ondemand_eager_filters_claim4 $.claim4
+ondemand_eager_filters_claim5 $.claim5
+ondemand_eager_filters_claim6 $.claim6
+ondemand_eager_filters_claim7 $.claim7
+ondemand_eager_filters_claim8 $.claim8
+ondemand_eager_filters_claim9 $.claim9
+ondemand_eager_filters_claim10 $.claim10
+ondemand_eager_filters_claim11 $.claim11
+ondemand_eager_filters_claim12 $.claim12
+ondemand_eager_filters_claim13 $.claim13
+ondemand_eager_filters_claim14 $.claim14
+ondemand_eager_filters_claim15 $.claim15
+ondemand_eager_filters_claim16 $.claim16
+ondemand_eager_filters_claim17 $.claim17
+ondemand_eager_filters_claim18 $.claim18
+ondemand_eager_filters_claim19 $.claim19
+ondemand_eager_filters_claim20 $.claim20

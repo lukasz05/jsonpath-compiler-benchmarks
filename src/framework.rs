@@ -13,10 +13,7 @@ use criterion::{Criterion, Throughput};
 use implementation::{Implementation, PreparedQuery};
 use std::{path::PathBuf, time::Duration};
 use thiserror::Error;
-use crate::implementations::jsonpath_compiler::{JsonPathCompilerOndemand,
-                                                JsonPathCompilerOndemandMmap,
-                                                JsonPathCompilerError,
-                                                JsonPathCompilerDom};
+use crate::implementations::jsonpath_compiler::{JsonPathCompilerOndemand, JsonPathCompilerOndemandMmap, JsonPathCompilerError, JsonPathCompilerDom, JsonPathCompilerOndemandEagerFilters};
 use crate::implementations::jsonstream::{JsonStream, JsonStreamError};
 
 pub mod benchmark_options;
@@ -32,6 +29,7 @@ pub enum BenchTarget<'q> {
     SerdeJsonPath(&'q str),
     JsonPathCompilerOndemandMmap(&'q str),
     JsonPathCompilerOndemand(&'q str),
+    JsonPathCompilerOndemandEagerFilters(&'q str),
     JsonPathCompilerDom(&'q str)
 }
 
@@ -189,7 +187,8 @@ impl Benchset {
             .add_target(BenchTarget::JsonStream(query))?
             //.add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
-            .add_target(BenchTarget::JsonPathCompilerOndemand(query))
+            .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
+            .add_target(BenchTarget::JsonPathCompilerOndemandEagerFilters(query))
     }
 
     pub fn finish(self) -> ConfiguredBenchset {
@@ -270,6 +269,11 @@ impl<'a> Target for BenchTarget<'a> {
             BenchTarget::JsonPathCompilerOndemandMmap(q) => {
                 let jsonpath_compiler_ondemand_mmap = JsonPathCompilerOndemandMmap::new()?;
                 let prepared = prepare(jsonpath_compiler_ondemand_mmap, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonPathCompilerOndemandEagerFilters(q) => {
+                let jsonpath_compiler_ondemand = JsonPathCompilerOndemandEagerFilters::new()?;
+                let prepared = prepare(jsonpath_compiler_ondemand, file_path, q, load_ahead_of_time, compile_ahead_of_time)?;
                 Ok(Box::new(prepared))
             }
             BenchTarget::JsonPathCompilerDom(q) => {
@@ -358,6 +362,18 @@ impl<'a> Target for BenchTarget<'a> {
                 let jsonpath_compiler_mmap = JsonPathCompilerOndemand::new()?;
                 let prepared = prepare_with_id(
                     jsonpath_compiler_mmap,
+                    id,
+                    file_path,
+                    q,
+                    load_ahead_of_time,
+                    compile_ahead_of_time
+                )?;
+                Ok(Box::new(prepared))
+            }
+            BenchTarget::JsonPathCompilerOndemandEagerFilters(q) => {
+                let jsonpath_compiler = JsonPathCompilerOndemandEagerFilters::new()?;
+                let prepared = prepare_with_id(
+                    jsonpath_compiler,
                     id,
                     file_path,
                     q,

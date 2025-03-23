@@ -6,8 +6,8 @@ use std::string::FromUtf8Error;
 use memmap2::Mmap;
 use thiserror::Error;
 
-use crate::dom_bindings;
-use crate::framework::implementation::{Implementation, Query};
+use crate::{dom_bindings, ondemand_eager_filters_bindings};
+use crate::framework::implementation::Implementation;
 use crate::ondemand_bindings;
 
 type QueryFunction = fn(&[u8]) -> String;
@@ -41,6 +41,32 @@ impl JsonPathCompilerCore<'_> {
                 ("$[?(@[0].geometry.coordinates[0][13][1] && @[0].geometry.coordinates[48][20][1] && @[0].geometry.coordinates[96][12][1] && @[0].geometry.coordinates[144][22][1] && @[0].geometry.coordinates[192][32][1] && @[0].geometry.coordinates[240][18][1] && @[0].geometry.coordinates[288][19][1] && @[0].geometry.coordinates[336][54][1] && @[0].geometry.coordinates[384][18][1] && @[0].geometry.coordinates[432][71][1])]", ondemand_bindings::canada_multiple_subqueries as QueryFunction),
                 ("$[?@[0]][?@.geometry][?@.coordinates][?@[479]][?@[5275]][5275][1]", ondemand_bindings::canada_consecutive_filter_segments as QueryFunction),
                 ("$[?@[0]][0][?@.coordinates][\"coordinates\"][?@[5275]][5275][1]", ondemand_bindings::canada_interleaved_filter_segments as QueryFunction)
+            ])
+        })
+    }
+
+    fn new_ondemand_eager_filters() -> Result<Self, JsonPathCompilerError> {
+        Ok(JsonPathCompilerCore {
+            query_functions: HashMap::from([
+                ("$.features[*].geometry.coordinates[*][*][1]", ondemand_eager_filters_bindings::canada_second_coord_component as QueryFunction),
+                ("$..coordinates[476][1446][1]", ondemand_eager_filters_bindings::canada_coord_476_1446_1 as QueryFunction),
+                ("$..seatCategoryId", ondemand_eager_filters_bindings::citm_seat_category as QueryFunction),
+                ("$..inner..inner..type.qualType", ondemand_eager_filters_bindings::ast_nested_inner as QueryFunction),
+                ("$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*", ondemand_eager_filters_bindings::ast_deepest as QueryFunction),
+                ("$..*", ondemand_eager_filters_bindings::bestbuy_all_nodes as QueryFunction),
+                ("$[*].routes[*].legs[*].steps[*].distance.text", ondemand_eager_filters_bindings::google_map_routes as QueryFunction),
+                ("$[*].available_travel_modes", ondemand_eager_filters_bindings::google_map_travel_modes as QueryFunction),
+                ("$..inner[0]", ondemand_eager_filters_bindings::inner_array as QueryFunction),
+                ("$..entities.user_mentions[1]", ondemand_eager_filters_bindings::user_second_mention_index as QueryFunction),
+                ("$.statuses[?(@.retweet_count == 58)]", ondemand_eager_filters_bindings::retweet_count_58 as QueryFunction),
+                ("$.statuses[?(@.retweet_count > 58)]", ondemand_eager_filters_bindings::retweet_count_gt_58 as QueryFunction),
+                ("$.statuses[?(@.retweet_count >= 1)]", ondemand_eager_filters_bindings::retweet_count_gte_1 as QueryFunction),
+                ("$..[?(@.text == \"abc\")]", ondemand_eager_filters_bindings::twitter_text_abc as QueryFunction),
+                ("$..[?(@.text)]", ondemand_eager_filters_bindings::twitter_text_exists as QueryFunction),
+                ("$.statuses[?@.id == 505874873961308160].entities.user_mentions[0].screen_name", ondemand_eager_filters_bindings::status_with_id_screen_name as QueryFunction),
+                ("$[?(@[0].geometry.coordinates[0][13][1] && @[0].geometry.coordinates[48][20][1] && @[0].geometry.coordinates[96][12][1] && @[0].geometry.coordinates[144][22][1] && @[0].geometry.coordinates[192][32][1] && @[0].geometry.coordinates[240][18][1] && @[0].geometry.coordinates[288][19][1] && @[0].geometry.coordinates[336][54][1] && @[0].geometry.coordinates[384][18][1] && @[0].geometry.coordinates[432][71][1])]", ondemand_eager_filters_bindings::canada_multiple_subqueries as QueryFunction),
+                ("$[?@[0]][?@.geometry][?@.coordinates][?@[479]][?@[5275]][5275][1]", ondemand_eager_filters_bindings::canada_consecutive_filter_segments as QueryFunction),
+                ("$[?@[0]][0][?@.coordinates][\"coordinates\"][?@[5275]][5275][1]", ondemand_eager_filters_bindings::canada_interleaved_filter_segments as QueryFunction)
             ])
         })
     }
@@ -164,6 +190,46 @@ impl Implementation for JsonPathCompilerOndemandMmap<'_> {
             let mapped_file = Mmap::map(&file)?;
             Ok(mapped_file)
         }
+    }
+
+    fn compile_query(&self, query: &str) -> Result<Self::Query, Self::Error> {
+        self.core.compile_query(query)
+    }
+
+    fn run<'a>(&self, query: &'a Self::Query, file: &'a Self::File) -> Result<Self::Result<'a>, Self::Error> {
+        self.core.run(query, file)
+    }
+}
+
+pub struct JsonPathCompilerOndemandEagerFilters<'a> {
+    core: JsonPathCompilerCore<'a>,
+}
+
+impl Implementation for JsonPathCompilerOndemandEagerFilters<'_> {
+    type Query = QueryFunction;
+
+    type File = Vec<u8>;
+
+    type Error = JsonPathCompilerError;
+
+    type Result<'a> = JsonPathCompilerResult;
+
+    fn id() -> &'static str {
+        "jsonpath_compiler_ondemand_eager_filters"
+    }
+
+    fn new() -> Result<Self, Self::Error> {
+        Ok(JsonPathCompilerOndemandEagerFilters {
+            core: JsonPathCompilerCore::new_ondemand_eager_filters()?
+        })
+    }
+
+    fn load_file(&self, file_path: &str) -> Result<Self::File, Self::Error> {
+        let file = fs::read_to_string(file_path)?;
+        let input = file.into_bytes();
+        let padding = vec![0; 64];
+        let padded_input = input.into_iter().chain(padding).collect();
+        Ok(padded_input)
     }
 
     fn compile_query(&self, query: &str) -> Result<Self::Query, Self::Error> {

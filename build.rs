@@ -39,18 +39,29 @@ fn compile_queries() -> Result<()> {
         .cpp(true)
         .std("c++20")
         .opt_level(3)
-        .include("/opt/homebrew/Cellar/simdjson/3.11.5/include")
+        .include("/opt/homebrew/Cellar/simdjson/3.12.2/include")
         .warnings(false)
         .compile("ondemand_queries");
+    cc::Build::new()
+        .file("src/ondemand_eager_filters_queries.cpp")
+        .cpp(true)
+        .std("c++20")
+        .opt_level(3)
+        .include("/opt/homebrew/Cellar/simdjson/3.12.2/include")
+        .warnings(false)
+        .compile("ondemand_eager_filters_queries");
     cc::Build::new()
         .file("src/dom_queries.cpp")
         .cpp(true)
         .std("c++20")
         .opt_level(3)
-        .include("/opt/homebrew/Cellar/simdjson/3.11.5/include")
+        .include("/opt/homebrew/Cellar/simdjson/3.12.2/include")
         .warnings(false)
         .compile("dom_queries");
-    println!("cargo:rustc-link-search=/opt/homebrew/Cellar/simdjson/3.11.5/lib");
+    println!("cargo:rerun-if-changed=src/ondemand_queries.cpp");
+    println!("cargo:rerun-if-changed=src/ondemand_eager_filters_queries.cpp");
+    println!("cargo:rerun-if-changed=src/dom_queries.cpp");
+    println!("cargo:rustc-link-search=/opt/homebrew/Cellar/simdjson/3.12.2/lib");
     println!("cargo:rustc-link-arg=-lsimdjson");
     Ok(())
 }

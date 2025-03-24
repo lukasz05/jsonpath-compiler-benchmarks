@@ -44,6 +44,17 @@ pub fn twitter_text_abc(c: &mut Criterion) -> Result<(), BenchmarkError> {
     Ok(())
 }
 
+pub fn twitter_text_abc_user(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("twitter_text_abc_user", dataset::twitter())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$..[?(@.text == \"abc\")].user")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
 pub fn twitter_text_exists(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("twitter_text_exists", dataset::twitter())?
         .do_not_measure_file_load_time()
@@ -58,7 +69,41 @@ pub fn twitter_text_exists(c: &mut Criterion) -> Result<(), BenchmarkError> {
 pub fn status_with_id_screen_name(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("status_with_id_screen_name", dataset::twitter())?
         .do_not_measure_file_load_time()
-        .add_all_targets_supporting_filters("$.statuses[?@.id == 505874873961308160].entities.user_mentions[0].screen_name")?
+        .add_all_targets_supporting_filters("$.statuses[?(@.id == 505874873961308160)].entities.user_mentions[0].screen_name")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
+pub fn status_with_id_screen_name_large(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("status_with_id_screen_name_large", dataset::pison_twitter_large())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$[?(@.id == 787994505744097280)].entities.user_mentions[0].screen_name")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
+
+pub fn status_with_id_descendants(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("status_with_id_descendants", dataset::twitter())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$.statuses[?(@.id == 505874873961308160)]..*")?
+        .finish();
+
+    benchset.run(c);
+
+    Ok(())
+}
+
+pub fn status_with_id_descendants_large(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let benchset = Benchset::new("status_with_id_descendants_large", dataset::pison_twitter_large())?
+        .do_not_measure_file_load_time()
+        .add_all_targets_supporting_filters("$[?(@.id == 787994505744097280)]..*")?
         .finish();
 
     benchset.run(c);
@@ -80,7 +125,7 @@ pub fn canada_multiple_subqueries(c: &mut Criterion) -> Result<(), BenchmarkErro
 pub fn canada_consecutive_filter_segments(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("canada_consecutive_filter_segments", dataset::nativejson_canada())?
         .do_not_measure_file_load_time()
-        .add_all_targets_supporting_filters("$[?@[0]][?@.geometry][?@.coordinates][?@[479]][?@[5275]][5275][1]")?
+        .add_all_targets_supporting_filters("$[?(@[0])][?(@.geometry)][?(@.coordinates)][?(@[479])][?(@[5275])][5275][1]")?
         .finish();
 
     benchset.run(c);
@@ -91,7 +136,7 @@ pub fn canada_consecutive_filter_segments(c: &mut Criterion) -> Result<(), Bench
 pub fn canada_interleaved_filter_segments(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("canada_interleaved_filter_segments", dataset::nativejson_canada())?
         .do_not_measure_file_load_time()
-        .add_all_targets_supporting_filters("$[?@[0]][0][?@.coordinates][\"coordinates\"][?@[5275]][5275][1]")?
+        .add_all_targets_supporting_filters("$[?(@[0])][0][?(@.coordinates)][\"coordinates\"][?(@[5275])[5275][1]")?
         .finish();
 
     benchset.run(c);
@@ -105,8 +150,12 @@ benchsets!(
     retweet_count_gt_58,
     retweet_count_gte_1,
     twitter_text_abc,
+    twitter_text_abc_user,
     twitter_text_exists,
     status_with_id_screen_name,
+    status_with_id_screen_name_large,
+    status_with_id_descendants,
+    status_with_id_descendants_large,
     canada_multiple_subqueries,
     canada_consecutive_filter_segments,
     canada_interleaved_filter_segments

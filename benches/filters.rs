@@ -80,7 +80,7 @@ pub fn status_with_id_screen_name(c: &mut Criterion) -> Result<(), BenchmarkErro
 pub fn status_with_id_screen_name_large(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("status_with_id_screen_name_large", dataset::pison_twitter_large())?
         .do_not_measure_file_load_time()
-        .add_all_targets_supporting_filters("$[?(@.id == 787994505744097280)].entities.user_mentions[0].screen_name")?
+        .add_all_targets_supporting_filters_except_jsurfer("$[?(@.id == 787994505744097280)].entities.user_mentions[0].screen_name")?
         .finish();
 
     benchset.run(c);
@@ -103,7 +103,7 @@ pub fn status_with_id_descendants(c: &mut Criterion) -> Result<(), BenchmarkErro
 pub fn status_with_id_descendants_large(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let benchset = Benchset::new("status_with_id_descendants_large", dataset::pison_twitter_large())?
         .do_not_measure_file_load_time()
-        .add_all_targets_supporting_filters("$[?(@.id == 787994505744097280)]..*")?
+        .add_all_targets_supporting_filters_except_jsurfer("$[?(@.id == 787994505744097280)]..*")?
         .finish();
 
     benchset.run(c);

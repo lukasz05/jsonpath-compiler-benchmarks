@@ -51,7 +51,10 @@ pub fn ast_deepest(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let query = "$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*";
     let benchset = Benchset::new("ast::deepest", dataset::ast())?
         .do_not_measure_file_load_time()
-        .add_all_targets_except_jsonpath_rust(query)?
+        .add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
+        .add_target(BenchTarget::JSurfer(query))?
+        .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
+        .add_target(BenchTarget::JsonPathCompilerDom(query))?
         .finish();
 
     benchset.run(c);
@@ -205,10 +208,10 @@ pub fn all_first_index(c: &mut Criterion) -> Result<(), BenchmarkError> {
 
 benchsets!(
     main_benches,
-    canada_second_coord_component,
-    canada_coord_476_1446_1,
-    citm_seat_category,
-    ast_nested_inner,
+    // canada_second_coord_component,
+    // canada_coord_476_1446_1,
+    // citm_seat_category,
+    // ast_nested_inner,
     ast_deepest,
     bestbuy_products_video_only_direct_nodes,
     bestbuy_products_video_only_descendant_nodes,

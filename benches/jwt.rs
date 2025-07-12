@@ -3,6 +3,9 @@ use std::cmp::min;
 use criterion::{Criterion, criterion_group, criterion_main};
 use serde_json::Value;
 use uuid::Uuid;
+use rand::{SeedableRng};
+use rand::rngs::StdRng;
+use rand::seq::SliceRandom;
 
 use jsonpath_compiler_benchmarks::ondemand_queries_bindings::*;
 
@@ -18,7 +21,10 @@ impl JWTPayloadGenerator {
     }
 
     pub fn generate(&self) -> String {
-        let claims = (1..self.custom_claim_count + 1)
+        let mut claims_ids: Vec<usize> = (1..self.custom_claim_count + 1).collect();
+        let mut rng = StdRng::seed_from_u64(0);
+        claims_ids.shuffle(&mut rng);
+        let claims = claims_ids
             .map(|id| Self::generate_custom_claim(id))
             .collect::<Vec<String>>()
             .join(",");

@@ -208,10 +208,10 @@ pub fn all_first_index(c: &mut Criterion) -> Result<(), BenchmarkError> {
 
 benchsets!(
     main_benches,
-    // canada_second_coord_component,
-    // canada_coord_476_1446_1,
-    // citm_seat_category,
-    // ast_nested_inner,
+    canada_second_coord_component,
+    canada_coord_476_1446_1,
+    citm_seat_category,
+    ast_nested_inner,
     ast_deepest,
     bestbuy_products_video_only_direct_nodes,
     bestbuy_products_video_only_descendant_nodes,

@@ -51,10 +51,7 @@ pub fn ast_deepest(c: &mut Criterion) -> Result<(), BenchmarkError> {
     let query = "$..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*..*";
     let benchset = Benchset::new("ast::deepest", dataset::ast())?
         .do_not_measure_file_load_time()
-        .add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
-        .add_target(BenchTarget::JSurfer(query))?
-        .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
-        .add_target(BenchTarget::JsonPathCompilerDom(query))?
+        .add_all_targets_except_jsonpath_rust(query)?
         .finish();
 
     benchset.run(c);
@@ -74,7 +71,7 @@ pub fn bestbuy_products_video_only_direct_nodes(c: &mut Criterion) -> Result<(),
 }
 
 pub fn bestbuy_products_video_only_descendant_nodes(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset = Benchset::new("bestbuy::products_video_only", dataset::pison_bestbuy_short())?
+    let benchset = Benchset::new("bestbuy::products_video_only_descendants", dataset::pison_bestbuy_short())?
         .do_not_measure_file_load_time()
         .add_all_targets("$..videoChapters")?
         .finish();
@@ -118,7 +115,7 @@ pub fn google_map_travel_modes_direct_nodes(c: &mut Criterion) -> Result<(), Ben
 }
 
 pub fn google_map_travel_modes_descendant_nodes(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset = Benchset::new("google_map::travel_modes", dataset::pison_google_map_short())?
+    let benchset = Benchset::new("google_map::travel_modes_descendants", dataset::pison_google_map_short())?
         .do_not_measure_file_load_time()
         .add_all_targets("$..available_travel_modes")?
         .finish();
@@ -140,7 +137,7 @@ pub fn walmart_items_name_direct_nodes(c: &mut Criterion) -> Result<(), Benchmar
 }
 
 pub fn walmart_items_name_descendant_nodes(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset = Benchset::new("walmart::items_name", dataset::pison_walmart_short())?
+    let benchset = Benchset::new("walmart::items_name_descendants", dataset::pison_walmart_short())?
         .do_not_measure_file_load_time()
         .add_all_targets("$..items_name")?
         .finish();
@@ -162,7 +159,7 @@ pub fn twitter_metadata_direct_nodes(c: &mut Criterion) -> Result<(), BenchmarkE
 }
 
 pub fn twitter_metadata_direct_descendant_nodes(c: &mut Criterion) -> Result<(), BenchmarkError> {
-    let benchset = Benchset::new("twitter::metadata", dataset::twitter())?
+    let benchset = Benchset::new("twitter::metadata_descendants", dataset::twitter())?
         .do_not_measure_file_load_time()
         .add_all_targets("$..count")?
         .finish();
@@ -195,9 +192,10 @@ pub fn user_second_mention_index(c: &mut Criterion) -> Result<(), BenchmarkError
 }
 
 pub fn all_first_index(c: &mut Criterion) -> Result<(), BenchmarkError> {
+    let query = "$..[0]";
     let benchset = Benchset::new("all_first_index", dataset::twitter())?
         .do_not_measure_file_load_time()
-        .add_all_targets("$..[0]")?
+        .add_all_targets_except_jsonpath_rust(query)?
         .finish();
 
     benchset.run(c);

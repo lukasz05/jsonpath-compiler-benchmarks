@@ -163,10 +163,17 @@ impl Benchset {
             .add_target(BenchTarget::SerdeJsonPath(query))
     }
 
+    pub fn add_all_targets_except_jsonpath_rust(self, query: &str) -> Result<Self, BenchmarkError> {
+        self.add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
+            .add_target(BenchTarget::JSurfer(query))?
+            .add_target(BenchTarget::SerdeJsonPath(query))?
+            .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
+            .add_target(BenchTarget::JsonPathCompilerDom(query))
+    }
+
     pub fn add_all_targets(self, query: &str) -> Result<Self, BenchmarkError> {
         self.add_target(BenchTarget::RsonpathMmap(query, ResultType::Full))?
             .add_target(BenchTarget::JSurfer(query))?
-            .add_target(BenchTarget::JsonStream(query))?
             .add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
@@ -184,16 +191,14 @@ impl Benchset {
 
     pub fn add_all_targets_supporting_filters(self, query: &str) -> Result<Self, BenchmarkError> {
         self.add_target(BenchTarget::JSurfer(query))?
-            .add_target(BenchTarget::JsonStream(query))?
-            //.add_target(BenchTarget::JsonpathRust(query))?
+            .add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemandEagerFilters(query))
     }
 
     pub fn add_all_targets_supporting_filters_except_jsurfer(self, query: &str) -> Result<Self, BenchmarkError> {
-        self.add_target(BenchTarget::JsonStream(query))?
-            .add_target(BenchTarget::JsonpathRust(query))?
+       self .add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemandEagerFilters(query))

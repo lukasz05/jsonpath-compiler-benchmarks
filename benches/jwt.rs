@@ -24,7 +24,7 @@ impl JWTPayloadGenerator {
         let mut claims_ids: Vec<usize> = (1..self.custom_claim_count + 1).collect();
         let mut rng = StdRng::seed_from_u64(0);
         claims_ids.shuffle(&mut rng);
-        let claims = claims_ids
+        let claims = claims_ids.into_iter()
             .map(|id| Self::generate_custom_claim(id))
             .collect::<Vec<String>>()
             .join(",");

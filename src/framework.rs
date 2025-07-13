@@ -191,15 +191,13 @@ impl Benchset {
 
     pub fn add_all_targets_supporting_filters(self, query: &str) -> Result<Self, BenchmarkError> {
         self.add_target(BenchTarget::JSurfer(query))?
-            .add_target(BenchTarget::JsonpathRust(query))?
             .add_target(BenchTarget::SerdeJsonPath(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemandEagerFilters(query))
     }
 
     pub fn add_all_targets_supporting_filters_except_jsurfer(self, query: &str) -> Result<Self, BenchmarkError> {
-       self .add_target(BenchTarget::JsonpathRust(query))?
-            .add_target(BenchTarget::SerdeJsonPath(query))?
+        self.add_target(BenchTarget::SerdeJsonPath(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemand(query))?
             .add_target(BenchTarget::JsonPathCompilerOndemandEagerFilters(query))
     }

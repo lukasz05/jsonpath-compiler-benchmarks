@@ -19,8 +19,9 @@ ENV SIMDJSON_PATH="/app/simdjson"
 
 # Download and build jsonpath-compiler
 WORKDIR /app
-RUN git clone https://github.com/lukasz05/jsonpath-compiler # TODO: checkout a specific version
+RUN git clone https://github.com/lukasz05/jsonpath-compiler
 WORKDIR /app/jsonpath-compiler
+RUN git checkout thesis-submission
 RUN cargo build --release
 ENV PATH="/app/jsonpath-compiler/target/release:${PATH}"
 

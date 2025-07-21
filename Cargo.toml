@@ -71,7 +71,3 @@ harness = false
 [[bench]]
 name = "filters"
 harness = false
-
-[[bench]]
-name = "google_map_increasing_size"
-harness = false

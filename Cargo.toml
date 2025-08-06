@@ -38,7 +38,7 @@ thiserror = "1.0.64"
 memmap2 = "0.9.5"
 uuid = { version = "1.11.0", features = ["v4"] }
 rand = "0.7.3"
-
+jsonpath-compiler = { path = "../jsonpath-compiler/jsonpath-compiler" }
 
 [dev-dependencies]
 itertools = "0.13.0"
@@ -70,4 +70,8 @@ harness = false
 
 [[bench]]
 name = "filters"
+harness = false
+
+[[bench]]
+name = "compilation_time"
 harness = false
